@@ -1,19 +1,22 @@
+// references --
+// http://getfirebug.com/wiki/index.php/Console_API
+// http://en.wikipedia.org/wiki/Javascript
+// http://en.wikipedia.org/wiki/JavaScript_syntax
+// https://developer.mozilla.org/En/XMLHttpRequest/Using_XMLHttpRequest
+// http://getfirebug.com/wiki/index.php/Console_API
+// http://developer.apple.com/library/safari/#documentation/AppleApplications/Conceptual/Safari_Developer_Guide/DebuggingYourWebsite/DebuggingYourWebsite.html%23//apple_ref/doc/uid/TP40007874-CH8-SW2
 
 function pull_base_logpage()
 {
     // Grab json-encoded config from webserver
     var http = new XMLHttpRequest();
 
-    http.open("GET", "http://localhost:2200/get_configuration");
-    http.onreadystatechange = function() {
-        if (http.readyState == 4) {
-            kickoff(http.responseText);
-            return(null);
-        }
-        else return(null);
-    }
+    http.open("GET", "http://localhost:2200/get_configuration", false);
     http.send(null);
-    return(null);
+    if (http.status == 200)
+        kickoff(http.responseText);
+    else
+        alert('Unable to read base configuration from REST server!');
 }
 
 function kickoff(respText)
@@ -23,6 +26,8 @@ function kickoff(respText)
     var json_config = JSON.parse(respText);
 
     draw_basic_canvas(json_config.num_cols, json_config.column_names);
+
+    write_logs(json_config.num_cols, json_config.column_names);
 }
 
 function draw_basic_canvas(num_cols, column_names)
@@ -34,6 +39,7 @@ function draw_basic_canvas(num_cols, column_names)
     canvas.height = $(window).height();
     canvas.width = $(window).width();
 
+    // Draw column markers, simple vertical lines
     // See http://diveintohtml5.org/canvas.html
     if (num_cols > 1)
     {
@@ -58,6 +64,53 @@ function draw_basic_canvas(num_cols, column_names)
     }
 }
 
+function get_logfile(log_name)
+{
+    var result = "";
+    var http = new XMLHttpRequest();
+    // Blocking read
+    var url = "http://localhost:2200/logs/" + log_name;
+    console.info(url);
+    http.open("GET", url, false);
+    http.send(null);
+
+    if (http.status == 200)
+    {
+        console.info(http.responseText);
+        return(JSON.parse(http.responseText));
+    }
+    else
+    {
+        return(null);
+    }
+}
+
+function write_logs(num_cols, column_names)
+{
+    // Pull the logs
+    var logs = [];
+
+    for (var idx = 0; idx < num_cols; idx++)
+    {
+        var cur_log = get_logfile(column_names[idx]);
+        logs.push(cur_log);
+    }
+    for (var idx = 0; idx < num_cols; idx++)
+    {
+        for (var row = 0; row < logs[idx].length; row++)
+        {
+            var col = ($(window).width() / num_cols) * idx;
+            console.info("idx: %d row: %d col: %d", idx, row, col);
+
+            var cur_col = logs[idx];
+            var cur_row = cur_col[row];
+            // Abs pixel-relative timestamp for now
+            draw_log_message(cur_row[0] * 10, col, cur_row[1]);
+        }
+    }
+
+}
+
 function draw_log_message(row, col, msg)
 {
     var canvas = document.getElementById("log_canvas");
@@ -68,4 +121,5 @@ function draw_log_message(row, col, msg)
 
     // Given canvas coordinates, display a message
     context.fillText(msg, row, col);
+    console.info(row, col, msg);
 }

@@ -7,13 +7,14 @@
 """
 
 
-from twisted.web import server, resource, client
-from twisted.internet.defer import inlineCallbacks, returnValue
+from twisted.web import server, resource
 from twisted.internet import reactor
 
 import simplejson as json
 import logging
-import uuid
+import fileinput
+
+LOGFILEDIR = 'logfiles'
 
 class JsonConfigPage(resource.Resource):
     isLeaf = True
@@ -47,21 +48,45 @@ class RootPage(resource.Resource):
         return "1"
 
 class LogFilePage(resource.Resource):
-    isLeaf = True
     """
     return log message X from file Y?
     """
 
-    def __init__(self):
+    def __init__(self, logfile_name):
         resource.Resource.__init__(self)
-        self.putChild("", self)
+        self.filename = logfile_name
 
     def render_GET(self, request):
+        """
+        Write a logfile to the client
+        """
         logging.info('LFP got Got request %s' % str(request))
-        page_gunk = str(uuid.uuid4())
-        page = json.dumps(page_gunk)
-        return page
+        return self._xform_logfile(LOGFILEDIR + '/' + self.filename)
 
+    def _xform_logfile(self, filename):
+        """
+        Take a logfile and return it as a json string of the form
+        Array of 2-element tuples (timestamp (int), string)
+        """
+        logging.debug('starting xform of %s' % filename)
+        m = []
+
+        for line in fileinput.input(filename):
+            ts, msg = line.split(':')
+            entry = list
+            entry = [str(ts), str(msg)]
+            m.append(entry)
+
+        logging.debug('sending "%s"' % json.dumps(m))
+        logging.debug('done with logfile %s'  % filename)
+        return(json.dumps(m))
+
+class LogFileRootPage(resource.Resource):
+    """
+    @see http://jcalderone.livejournal.com/48953.html
+    """
+    def getChild(self, name, request):
+        return LogFilePage(name)
 
 
 def main():
@@ -69,7 +94,7 @@ def main():
         format='%(asctime)s %(levelname)s [%(funcName)s] %(message)s')
     root = resource.Resource()
     root.putChild('', RootPage())
-    root.putChild('logs', LogFilePage())
+    root.putChild('logs', LogFileRootPage())
     root.putChild('get_configuration', JsonConfigPage())
     site = server.Site(root)
     reactor.listenTCP(2200, site)
