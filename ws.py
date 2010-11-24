@@ -13,6 +13,8 @@ from twisted.internet import reactor
 import simplejson as json
 import logging
 import fileinput
+import os, sys
+from stat import ST_MODE, S_ISDIR, S_ISREG
 
 LOGFILEDIR = 'logfiles'
 
@@ -24,9 +26,22 @@ class JsonConfigPage(resource.Resource):
         self.putChild('', self)
 
     def render_GET(self, request):
-        logging.debug('Got config request')
-        cfg = {'num_cols' : 3,
-               'column_names' : ['foo', 'bar', 'baz']}
+        logging.debug('Got config request, walking %s' % LOGFILEDIR)
+        num_cols = 0
+        column_names = []
+
+        # @see file:///Users/hubbard/Documents/Python%202.6.5%20docs/library/stat.html
+        for f in os.listdir(LOGFILEDIR):
+            pathname = os.path.join(LOGFILEDIR, f)
+            mode = os.stat(pathname)[ST_MODE]
+            if S_ISREG(mode):
+                # Regular file, add to list
+                num_cols = num_cols + 1
+                column_names.append(f)
+
+        cfg = {'num_cols' : num_cols,
+               'column_names' : column_names}
+        logging.debug('results of traversal: %s' % json.dumps(cfg))
         return json.dumps(cfg)
 
 class RootPage(resource.Resource):
@@ -72,7 +87,7 @@ class LogFilePage(resource.Resource):
         m = []
 
         for line in fileinput.input(filename):
-            ts, msg = line.split(':')
+            ts, msg = line.strip().split(':')
             entry = list
             entry = [str(ts), str(msg)]
             m.append(entry)

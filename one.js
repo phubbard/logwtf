@@ -90,19 +90,21 @@ function write_logs(num_cols, column_names)
     // Pull the logs
     var logs = [];
 
+    // get the logs
     for (var idx = 0; idx < num_cols; idx++)
     {
         var cur_log = get_logfile(column_names[idx]);
         logs.push(cur_log);
     }
-    for (var idx = 0; idx < num_cols; idx++)
+    // Display the logfiles, columnwise indexing
+    for (var cur_column = 0; cur_column < num_cols; cur_column++)
     {
-        for (var row = 0; row < logs[idx].length; row++)
+        for (var row = 0; row < logs[cur_column].length; row++)
         {
-            var col = ($(window).width() / num_cols) * idx;
-            console.info("idx: %d row: %d col: %d", idx, row, col);
+            var col = ($(window).width() / num_cols) * cur_column;
+            console.info("cur_column: %d row: %d col: %d", cur_column, row, col);
 
-            var cur_col = logs[idx];
+            var cur_col = logs[cur_column];
             var cur_row = cur_col[row];
             // Abs pixel-relative timestamp for now
             draw_log_message(cur_row[0] * 10, col, cur_row[1]);
@@ -116,10 +118,10 @@ function draw_log_message(row, col, msg)
     var canvas = document.getElementById("log_canvas");
     var context = canvas.getContext("2d");
 
-    context.font = "bold 10px";
+    context.font = "10px";
     context.textBaseline="top"
 
     // Given canvas coordinates, display a message
-    context.fillText(msg, row, col);
-    console.info(row, col, msg);
+    context.fillText(msg, col, row);
+    console.debug(row, col, msg);
 }
