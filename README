@@ -1,0 +1,31 @@
+
+What this is
+
+The Problem:
+We have a problem on our project (http://ooici.net/): We're writing multiprocessing messaging-based
+code with a single logfile/stream, using Python logging. The problem is trying to
+decipher what's going wrong from the intermingled log messages.
+
+The Idea:
+What you want to see is a message sequence chart, where there's a column in a browser
+for each process/thread, and the vertical axis is time.
+
+The Technology:
+1) html5 canvas, used as simple (x,y, text)
+2) jquery (for event hooks, viewport size)
+3) python + twisted to create a RESTful server
+4) javascript to pull and display
+
+A sketch of the goal:
+- The python code, with its richer libraries and easy filesystem access, is responsible for
+  loading and parsing the logfile into a set of arrays. It needs to have timestamps as time_t
+  so that the javascript can scale the Y axis correctly.
+- The python code then presents a REST API on TCP:2200. Currently implemented
+  - get_configuration returns a json object with num_columns and an array of column names.
+  - stub code for returning a log message based on a column name and index
+- The JS code
+ - Pulls the config
+ - Draws the canvas (full window)
+ - Writes the column headers
+
+ Lots of work left!
