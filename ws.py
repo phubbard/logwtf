@@ -13,8 +13,8 @@ from twisted.internet import reactor
 import simplejson as json
 import logging
 import fileinput
-import os, sys
-from stat import ST_MODE, S_ISDIR, S_ISREG
+import os
+from stat import ST_MODE, S_ISREG
 
 LOGFILEDIR = 'logfiles'
 
@@ -26,7 +26,7 @@ class JsonConfigPage(resource.Resource):
         self.putChild('', self)
 
     def render_GET(self, request):
-        logging.debug('Got config request, walking %s' % LOGFILEDIR)
+        logging.info('Got config request, walking %s' % LOGFILEDIR)
         num_cols = 0
         column_names = []
 
@@ -41,7 +41,7 @@ class JsonConfigPage(resource.Resource):
 
         cfg = {'num_cols' : num_cols,
                'column_names' : column_names}
-        logging.debug('results of traversal: %s' % json.dumps(cfg))
+        logging.info('results of traversal: %s' % json.dumps(cfg))
         return json.dumps(cfg)
 
 class RootPage(resource.Resource):
@@ -75,13 +75,13 @@ class LogFilePage(resource.Resource):
         """
         Write a logfile to the client
         """
-        logging.info('LFP got Got request %s' % str(request))
+        logging.info('Got request for %s' % str(request))
         return self._xform_logfile(LOGFILEDIR + '/' + self.filename)
 
     def _xform_logfile(self, filename):
         """
         Take a logfile and return it as a json string of the form
-        Array of 2-element tuples (timestamp (int), string)
+        Array of 2-element array (timestamp, string)
         """
         logging.debug('starting xform of %s' % filename)
         m = []
@@ -105,7 +105,7 @@ class LogFileRootPage(resource.Resource):
 
 
 def main():
-    logging.basicConfig(level=logging.DEBUG,
+    logging.basicConfig(level=logging.INFO,
         format='%(asctime)s %(levelname)s [%(funcName)s] %(message)s')
     root = resource.Resource()
     root.putChild('', RootPage())

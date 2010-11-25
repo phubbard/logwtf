@@ -5,6 +5,18 @@
 // https://developer.mozilla.org/En/XMLHttpRequest/Using_XMLHttpRequest
 // http://getfirebug.com/wiki/index.php/Console_API
 // http://developer.apple.com/library/safari/#documentation/AppleApplications/Conceptual/Safari_Developer_Guide/DebuggingYourWebsite/DebuggingYourWebsite.html%23//apple_ref/doc/uid/TP40007874-CH8-SW2
+// http://diveintohtml5.org/canvas.html
+// http://en.wikipedia.org/wiki/Json
+
+function main()
+{
+    // Top-level orchestration routine for the system.
+    var config = pull_base_logpage();
+
+    draw_basic_canvas(config.num_cols, config.column_names);
+    write_logs(config.num_cols, config.column_names);
+
+}
 
 function pull_base_logpage()
 {
@@ -14,20 +26,9 @@ function pull_base_logpage()
     http.open("GET", "http://localhost:2200/get_configuration", false);
     http.send(null);
     if (http.status == 200)
-        kickoff(http.responseText);
+        return(JSON.parse(http.responseText))
     else
         alert('Unable to read base configuration from REST server!');
-}
-
-function kickoff(respText)
-{
-    // Decode configuration and pass to next step
-    // See http://en.wikipedia.org/wiki/Json
-    var json_config = JSON.parse(respText);
-
-    draw_basic_canvas(json_config.num_cols, json_config.column_names);
-
-    write_logs(json_config.num_cols, json_config.column_names);
 }
 
 function draw_basic_canvas(num_cols, column_names)
@@ -40,7 +41,6 @@ function draw_basic_canvas(num_cols, column_names)
     canvas.width = $(window).width();
 
     // Draw column markers, simple vertical lines
-    // See http://diveintohtml5.org/canvas.html
     if (num_cols > 1)
     {
         var cwidth = $(window).width() / num_cols;
