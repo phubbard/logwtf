@@ -70,6 +70,15 @@ class IonLog():
         logging.debug('tzero is %s' % str(dtime))
         return dtime
 
+    def _filter_character(self, char):
+        if char.isalnum():
+            return True
+        if char.isspace():
+            return True
+        if char in "[]{}\|;:'<>,./?`~!@#$%^&*()-_=+":
+            return True
+        return False
+
     def _filter_msg(self, mstr):
         """
         Some message strings are not json-encodable due to binary characters. This
@@ -77,7 +86,7 @@ class IonLog():
         to accomplish this.
         @see http://stackoverflow.com/questions/870520/in-python-how-do-you-filter-a-string-such-that-only-characters-in-your-list-are
         """
-        return(filter(lambda x: x.isalnum() | x.isspace(), mstr))
+        return(filter(self._filter_character, mstr))
 
     def load_and_parse(self):
         try:
