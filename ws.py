@@ -14,6 +14,7 @@ import simplejson as json
 import logging
 import fileinput
 import os
+import re
 from stat import ST_MODE, S_ISREG
 
 LOGFILEDIR = 'logfiles'

@@ -7,6 +7,11 @@
 // http://developer.apple.com/library/safari/#documentation/AppleApplications/Conceptual/Safari_Developer_Guide/DebuggingYourWebsite/DebuggingYourWebsite.html%23//apple_ref/doc/uid/TP40007874-CH8-SW2
 // http://diveintohtml5.org/canvas.html
 // http://en.wikipedia.org/wiki/Json
+// http://jslint.com/
+
+logwtf = {};
+logwtf.base_url = 'http://localhost:2200';
+logwtf.text_height = 10;
 
 function main()
 {
