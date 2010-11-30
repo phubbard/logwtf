@@ -9,11 +9,7 @@
 
 import logging
 import re
-import json
 from datetime import datetime
-
-ION_LOGFILEDIR = '/Users/hubbard/code/lcaarch/logs'
-ION_LOGFILE = ION_LOGFILEDIR + '/' + 'ioncontainer.log'
 
 class IonLog():
     """
@@ -71,6 +67,9 @@ class IonLog():
         return dtime
 
     def _filter_character(self, char):
+        """
+        Filter out non-encodable characters, most common cases first for speed.
+        """
         if char.isalnum():
             return True
         if char.isspace():
@@ -89,6 +88,12 @@ class IonLog():
         return(filter(self._filter_character, mstr))
 
     def load_and_parse(self):
+        """
+        Trigger to load, parse and encode the datafile. Results available via
+        get_keys and get_log.
+        Call this to trigger a reload and reparse of the logfile.
+        @retval None
+        """
         try:
             logging.debug('Opening %s' % self.fn)
             fh = open(self.fn)
@@ -120,18 +125,20 @@ class IonLog():
                    'msg': self._filter_msg(item[3])}
             pdlist[item[1]].append(val)
 
-        #return(json.dumps(pdlist))
-        from IPython.Shell import IPShellEmbed
+        # Save data internally
+        self.keys = pdlist.keys()
+        self.data = pdlist
 
-        ipshell = IPShellEmbed()
-        ipshell()
+    def get_names(self):
+        if not hasattr(self, 'keys'):
+            logging.debug('Triggering loading and parsing')
+            self.load_and_parse()
 
+        return self.keys
 
-        # Split array of matches into N arrays based on process/entity name
-        # @see http://wiki.python.org/moin/HowTo/Sorting/
+    def get_single_log(self, ident_name):
+        if not hasattr(self, 'keys'):
+            logging.debug('Triggering loading and parsing')
+            self.load_and_parse()
 
-if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG,
-                        format='%(asctime)s %(levelname)s [%(funcName)s] %(message)s')
-    il = IonLog(ION_LOGFILE)
-    logging.debug(il.load_and_parse())
+        return self.data[ident_name]
