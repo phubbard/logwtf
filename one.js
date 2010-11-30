@@ -10,7 +10,7 @@
 // http://jslint.com/
 
 logwtf = {};
-logwtf.base_url = 'http://localhost:2200';
+logwtf.base_url = 'http://137.110.111.241:2200';
 logwtf.text_height = 10;
 
 function main()
@@ -70,7 +70,6 @@ function draw_basic_canvas(num_cols, column_names)
 
 function get_logfile(log_name)
 {
-    var result = "";
     var http = new XMLHttpRequest();
     // Blocking read
     var url = logwtf.base_url + '/' + log_name;
@@ -116,7 +115,7 @@ function draw_log_message(row, col, msg)
     var canvas = document.getElementById("log_canvas");
     var context = canvas.getContext("2d");
 
-    context.font = "10px";
+    context.font = logwtf.text_height + "px";
     context.textBaseline="top"
 
     // Given canvas coordinates, display a message
