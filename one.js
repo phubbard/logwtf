@@ -20,7 +20,6 @@ function main()
 
     draw_basic_canvas(config.num_cols, config.column_names);
     write_logs(config.num_cols, config.column_names);
-
 }
 
 function pull_base_logpage()
@@ -28,7 +27,7 @@ function pull_base_logpage()
     // Grab json-encoded config from webserver
     var http = new XMLHttpRequest();
 
-    http.open("GET", "http://localhost:2200/get_configuration", false);
+    http.open("GET", logwtf.base_url + '/get_configuration', false);
     http.send(null);
     if (http.status == 200)
         return(JSON.parse(http.responseText))
@@ -74,20 +73,14 @@ function get_logfile(log_name)
     var result = "";
     var http = new XMLHttpRequest();
     // Blocking read
-    var url = "http://localhost:2200/logs/" + log_name;
-    console.info(url);
+    var url = logwtf.base_url + '/' + log_name;
     http.open("GET", url, false);
     http.send(null);
 
     if (http.status == 200)
-    {
-        console.info(http.responseText);
         return(JSON.parse(http.responseText));
-    }
     else
-    {
         return(null);
-    }
 }
 
 function write_logs(num_cols, column_names)
@@ -107,12 +100,12 @@ function write_logs(num_cols, column_names)
         for (var row = 0; row < logs[cur_column].length; row++)
         {
             var col = ($(window).width() / num_cols) * cur_column;
-            console.info("cur_column: %d row: %d col: %d", cur_column, row, col);
+            //console.info("cur_column: %d row: %d col: %d", cur_column, row, col);
 
             var cur_col = logs[cur_column];
             var cur_row = cur_col[row];
             // Abs pixel-relative timestamp for now
-            draw_log_message(cur_row[0] * 10, col, cur_row[1]);
+            draw_log_message(cur_row.delta_t * 10, col, cur_row.msg);
         }
     }
 
@@ -128,5 +121,5 @@ function draw_log_message(row, col, msg)
 
     // Given canvas coordinates, display a message
     context.fillText(msg, col, row);
-    console.debug(row, col, msg);
+    //console.debug(row, col, msg);
 }
