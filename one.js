@@ -8,6 +8,9 @@
 // http://diveintohtml5.org/canvas.html
 // http://en.wikipedia.org/wiki/Json
 // http://jslint.com/
+// https://developer.mozilla.org/en/drawing_text_using_a_canvas
+// http://uupaa-js-spinoff.googlecode.com/svn/trunk/uuCanvas.js/demo.canvas/8_2_canvas_measureText.htm
+
 
 logwtf = {};
 logwtf.base_url = 'http://137.110.111.241:2200';
@@ -24,6 +27,8 @@ function main()
     var config = pull_base_logpage();
 
     draw_basic_canvas(config.num_cols, config.column_names);
+    console.info('span: ' + config.timespan);
+    console.info('max : ' + config.max_messages);
     write_logs(config.num_cols, config.column_names);
 }
 
@@ -37,7 +42,7 @@ function pull_base_logpage()
     if (http.status == 200)
         return(JSON.parse(http.responseText))
     else
-        alert('Unable to read base configuration from REST server!');
+        alert('Unable to read base configuration from REST server! Check ' + logwtf.base_url);
 }
 
 function draw_basic_canvas(num_cols, column_names)
@@ -131,7 +136,7 @@ function draw_log_message(row, col, msg, level)
         context.fillStyle = logwtf.debug_color;
     else if (level=='INFO')
         context.fillStyle = logwtf.info_color;
-    else if (level=='WARN')
+    else if (level=='WARNING')
         context.fillStyle = logwtf.warn_color;
     else if (level=='ERROR')
         context.fillStyle = logwtf.error_color;
@@ -142,8 +147,8 @@ function draw_log_message(row, col, msg, level)
     }
 
     // Figure out clipping
-    tl = context.measureText(msg);
-    console.info(tl);
+    //tl = context.measureText(msg);
+    //console.info(tl);
     // Given canvas coordinates, display a message
     context.fillText(msg, col+2, row);
     //console.debug(row, col, msg);

@@ -40,7 +40,8 @@ class IonLFP(resource.Resource):
         logging.info('Got request for "%s"' % self.name)
 
         if self.name == '':
-            # Force reload and parse on root page???
+            # Force reload and parse on root page load
+            self.ilo.load_and_parse()
             keys = self.ilo.get_names()
             request.write('<html>Logs by identifier:<nl>')
             for x in keys:
@@ -49,10 +50,8 @@ class IonLFP(resource.Resource):
             return ''
 
         if self.name == 'get_configuration':
-            cfg = {'num_cols': len(self.ilo.get_names()),
-                   'column_names': self.ilo.get_names()}
-            return(json.dumps(cfg))
-
+            return self.ilo.get_config()
+            
         # Normal log page
         return(json.dumps(self.ilo.get_single_log(self.name)))
 

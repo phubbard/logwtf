@@ -9,6 +9,7 @@
 
 import logging
 import re
+import json
 from datetime import datetime
 
 class IonLog():
@@ -28,6 +29,8 @@ class IonLog():
         self.fn = filename
         # Note the multiline flag for the regex - will not work otherwise!
         self.regex = re.compile(self.re_str, re.M)
+        self.max_delta_t = 0.0
+        self.max_per_source = 0
 
     def _to_datetime(self, timestamp):
         """
@@ -119,8 +122,12 @@ class IonLog():
         logging.debug('Found %d identities' % len(pdlist))
         # Now append the log messages to each array
         for item in pdata:
+            dt = self._delta_t(item[0])
+            # Keep track of max delta t and # of messages in a source
+            if dt > self.max_delta_t:
+                self.max_delta_t = dt
             val = {'time' : item[0],
-                   'delta_t' : self._delta_t(item[0]),
+                   'delta_t' : dt,
                    'level' : item[2],
                    'msg': self._filter_msg(item[3])}
             pdlist[item[1]].append(val)
@@ -128,6 +135,23 @@ class IonLog():
         # Save data internally
         self.keys = pdlist.keys()
         self.data = pdlist
+
+        # Compute source with max number of messages
+        for key in pdlist.keys():
+            if len(key) > self.max_per_source:
+                self.max_per_source = len(key)
+
+        logging.debug('Timespan: %f Max messages: %d' % (self.max_delta_t, self.max_per_source))
+
+    def get_config(self):
+        if not hasattr(self, 'keys'):
+            logging.debug('Triggering loading and parsing')
+            self.load_and_parse()
+        cfg = {'num_cols' : len(self.get_names()),
+               'column_names' : self.get_names(),
+               'timespan': self.max_delta_t,
+               'max_messages': self.max_per_source}
+        return json.dumps(cfg)
 
     def get_names(self):
         if not hasattr(self, 'keys'):
