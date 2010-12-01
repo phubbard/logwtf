@@ -16,18 +16,21 @@ The Technology:
 3) python + twisted to create a RESTful server
 4) javascript to pull and display
 
-A sketch of the goal:
-- The python code, with its richer libraries and easy filesystem access, is responsible for
-  loading and parsing the logfile into a set of arrays. It needs to have timestamps as time_t
-  so that the javascript can scale the Y axis correctly.
-- The python code then presents a REST API on TCP:2200. Currently implemented
-  - get_configuration returns a json object with num_columns and an array of column names.
-  - stub code for returning a log message based on a column name and index
-- The JS code
- - Pulls the config
- - Draws the canvas (full window)
- - Writes the column headers
+The components:
+1) ionlog.py to parse and restructure the logfile into a set of data with 3 methods
+ a) get_config returns a dictionary of num_cols and column_names
+ b) get_names returns just the column names
+ c) get_single_log(name) returns just an array of messages for a given name
+ Result is an array of dictionaries with
+ i) delta_t time since first log message (relative time, in seconds)
+ ii) timestamp, ISO 8601 (absolute time)
+ iii) log level for colorization and filtering. DEBUG, INFO, WARNING, ERROR, CRITICAL
+ iv) Msg has the string, filtered a bit for json-encodabilty
+2) ws.py to present via REST and also handle JSON encoding
+3) one.js for javascript code.
+ a) Pull the configuration to draw the canvas
+ b) add column headers
+ c) for each column, draw the messages on the canvas
+4) one.html as the page to load that invokes the jscript
 
- Lots of work left! Here's a screenshot of the current state of the code, showing the above:
-
-https://github.com/phubbard/logwtf/raw/master/pic1.png
+Lots of work left!

@@ -34,9 +34,11 @@ class IonLFP(resource.Resource):
         """
         Write a logfile to the client. Ignores the request and pulls relative
         url from self.name.
+        @todo Use children classes for configuration and logfile transfer, not if/then/else
         """
         if self.name == 'favicon.ico':
             return ''
+        
         logging.info('Got request for "%s"' % self.name)
 
         if self.name == '':
@@ -50,8 +52,8 @@ class IonLFP(resource.Resource):
             return ''
 
         if self.name == 'get_configuration':
-            return self.ilo.get_config()
-            
+            return json.dumps(self.ilo.get_config())
+
         # Normal log page
         return(json.dumps(self.ilo.get_single_log(self.name)))
 

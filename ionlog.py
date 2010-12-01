@@ -9,7 +9,6 @@
 
 import logging
 import re
-import json
 from datetime import datetime
 
 class IonLog():
@@ -151,7 +150,7 @@ class IonLog():
                'column_names' : self.get_names(),
                'timespan': self.max_delta_t,
                'max_messages': self.max_per_source}
-        return json.dumps(cfg)
+        return cfg
 
     def get_names(self):
         if not hasattr(self, 'keys'):

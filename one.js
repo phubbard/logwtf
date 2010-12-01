@@ -1,19 +1,26 @@
-// references --
-// http://getfirebug.com/wiki/index.php/Console_API
-// http://en.wikipedia.org/wiki/Javascript
-// http://en.wikipedia.org/wiki/JavaScript_syntax
-// https://developer.mozilla.org/En/XMLHttpRequest/Using_XMLHttpRequest
-// http://getfirebug.com/wiki/index.php/Console_API
-// http://developer.apple.com/library/safari/#documentation/AppleApplications/Conceptual/Safari_Developer_Guide/DebuggingYourWebsite/DebuggingYourWebsite.html%23//apple_ref/doc/uid/TP40007874-CH8-SW2
-// http://diveintohtml5.org/canvas.html
-// http://en.wikipedia.org/wiki/Json
-// http://jslint.com/
-// https://developer.mozilla.org/en/drawing_text_using_a_canvas
-// http://uupaa-js-spinoff.googlecode.com/svn/trunk/uuCanvas.js/demo.canvas/8_2_canvas_measureText.htm
+/*
+  Paul Hubbard
+  11/22/10
 
+  See https://github.com/phubbard/logwtf
+
+ references --
+ http://getfirebug.com/wiki/index.php/Console_API
+ http://en.wikipedia.org/wiki/Javascript
+ http://en.wikipedia.org/wiki/JavaScript_syntax
+ https://developer.mozilla.org/En/XMLHttpRequest/Using_XMLHttpRequest
+ http://getfirebug.com/wiki/index.php/Console_API
+ http://developer.apple.com/library/safari/#documentation/AppleApplications/Conceptual/Safari_Developer_Guide/DebuggingYourWebsite/DebuggingYourWebsite.html%23//apple_ref/doc/uid/TP40007874-CH8-SW2
+ http://diveintohtml5.org/canvas.html
+ http://en.wikipedia.org/wiki/Json
+ http://jslint.com/
+ https://developer.mozilla.org/en/drawing_text_using_a_canvas
+ http://uupaa-js-spinoff.googlecode.com/svn/trunk/uuCanvas.js/demo.canvas/8_2_canvas_measureText.htm
+*/
 
 logwtf = {};
-logwtf.base_url = 'http://137.110.111.241:2200';
+//logwtf.base_url = 'http://137.110.111.241:2200';
+logwtf.base_url = 'http://localhost:2200';
 logwtf.text_height = 10; // pixels
 logwtf.column_width = 100; //pixels, will be overriden at first load
 logwtf.debug_color = '#0f0';
