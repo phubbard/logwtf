@@ -11,7 +11,12 @@
 
 logwtf = {};
 logwtf.base_url = 'http://137.110.111.241:2200';
-logwtf.text_height = 10;
+logwtf.text_height = 10; // pixels
+logwtf.column_width = 100; //pixels, will be overriden at first load
+logwtf.debug_color = '#0f0';
+logwtf.info_color = '#00f';
+logwtf.warn_color = '#ff0';
+logwtf.error_color = '#f00';
 
 function main()
 {
@@ -44,13 +49,17 @@ function draw_basic_canvas(num_cols, column_names)
     canvas.height = $(window).height();
     canvas.width = $(window).width();
 
+    // Figure how many rows we have and save
+    logwtf.num_rows = $(window).height() / 10;
+    // And column width too
+    logwtf.column_width = $(window).width() / num_cols;
+
     // Draw column markers, simple vertical lines
     if (num_cols > 1)
     {
-        var cwidth = $(window).width() / num_cols;
         for (var idx = 1; idx < num_cols; idx++)
         {
-            var x = idx * cwidth;
+            var x = idx * logwtf.column_width;
             context.moveTo(x, 0);
             context.lineTo(x, $(window).height());
         }
@@ -62,9 +71,7 @@ function draw_basic_canvas(num_cols, column_names)
         context.textBaseline = "top";
 
         for (var idx = 0; idx < num_cols; idx++)
-        {
-            context.fillText(column_names[idx], idx * cwidth, 0);
-        }
+            context.fillText(column_names[idx], (idx * logwtf.column_width) + 2, 0);
     }
 }
 
@@ -84,7 +91,9 @@ function get_logfile(log_name)
 
 function write_logs(num_cols, column_names)
 {
-    // Pull the logs
+    // Iterate over the column_names, pulling each from the server and rendering it.
+
+    // We will hold all of the logfiles in an array
     var logs = [];
 
     // get the logs
@@ -96,7 +105,7 @@ function write_logs(num_cols, column_names)
     // Display the logfiles, columnwise indexing
     for (var cur_column = 0; cur_column < num_cols; cur_column++)
     {
-        for (var row = 0; row < logs[cur_column].length; row++)
+        for (var row = 0; row < Math.min(logwtf.num_rows, logs[cur_column].length); row++)
         {
             var col = ($(window).width() / num_cols) * cur_column;
             //console.info("cur_column: %d row: %d col: %d", cur_column, row, col);
@@ -104,21 +113,38 @@ function write_logs(num_cols, column_names)
             var cur_col = logs[cur_column];
             var cur_row = cur_col[row];
             // Abs pixel-relative timestamp for now
-            draw_log_message(cur_row.delta_t * 10, col, cur_row.msg);
+            //draw_log_message(cur_row.delta_t * 10, col, cur_row.msg);
+            draw_log_message((row + 2) * logwtf.text_height, col, cur_row.msg, cur_row.level)
         }
     }
 
 }
 
-function draw_log_message(row, col, msg)
+function draw_log_message(row, col, msg, level)
 {
     var canvas = document.getElementById("log_canvas");
     var context = canvas.getContext("2d");
 
     context.font = logwtf.text_height + "px";
     context.textBaseline="top"
+    if (level=='DEBUG')
+        context.fillStyle = logwtf.debug_color;
+    else if (level=='INFO')
+        context.fillStyle = logwtf.info_color;
+    else if (level=='WARN')
+        context.fillStyle = logwtf.warn_color;
+    else if (level=='ERROR')
+        context.fillStyle = logwtf.error_color;
+    else
+    {
+        console.error('Unknown log level ' + level);
+        context.fillStyle = logwtf.error_color;
+    }
 
+    // Figure out clipping
+    tl = context.measureText(msg);
+    console.info(tl);
     // Given canvas coordinates, display a message
-    context.fillText(msg, col, row);
+    context.fillText(msg, col+2, row);
     //console.debug(row, col, msg);
 }
