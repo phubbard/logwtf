@@ -13,7 +13,12 @@ from datetime import datetime
 
 class IonLog():
     """
-    Magic regex (via komodo RX tool) to group up ion log messages into
+    IonLog is responsible for loading, parsing and rearranging the logs into a collection
+    sorted by process name, and also for computing relative times.
+    """
+
+    """
+    The Magic Regex (via komodo RX tool) to group up ion log messages into
     datetime, source/process/service, log level and message. e.g.
 
     ('2010-11-29 12:53:52.920',
@@ -24,6 +29,7 @@ class IonLog():
     re_str = '^(\d\d\d\d\-\d\d\-\d\d\s\d\d:\d\d:\d\d\.\d\d\d)\s\[(\S+)\s*:\s*\S+\]\s(INFO|DEBUG|ERROR|WARNING|CRITICAL|EXCEPTION)\s*:(.+)$'
 
     def __init__(self, filename=None):
+        # Save logfile name for later, just init variables here.
         assert(filename != None)
         self.fn = filename
         # Note the multiline flag for the regex - will not work otherwise!

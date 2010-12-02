@@ -38,7 +38,12 @@ class IonLFP(resource.Resource):
         """
         if self.name == 'favicon.ico':
             return ''
-        
+
+        try:
+            format = request.args.get('format')[0]
+        except:
+            format = None
+
         logging.info('Got request for "%s"' % self.name)
 
         if self.name == '':
@@ -47,7 +52,8 @@ class IonLFP(resource.Resource):
             keys = self.ilo.get_names()
             request.write('<html>Logs by identifier:<nl>')
             for x in keys:
-                request.write('<li><a href="/%s">%s</a></li>' % (x, x))
+                request.write('<li><a href="/%s?&format=text">%s</a>' % (x,x))
+                request.write(' <a href="/%s">(json)</a></li>' % x)
             request.write('</nl></html>')
             return ''
 
@@ -55,7 +61,13 @@ class IonLFP(resource.Resource):
             return json.dumps(self.ilo.get_config())
 
         # Normal log page
-        return(json.dumps(self.ilo.get_single_log(self.name)))
+        if format == None:
+           return(json.dumps(self.ilo.get_single_log(self.name)))
+        else:
+            request.write('<pre>')
+            request.write(str(self.ilo.get_single_log(self.name)))
+            request.write('</pre>')
+            return ''
 
 class LogFileRootPage(resource.Resource):
     """
