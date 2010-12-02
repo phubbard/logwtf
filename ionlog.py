@@ -10,6 +10,7 @@
 import logging
 import re
 from datetime import datetime
+from time import time
 
 class IonLog():
     """
@@ -102,6 +103,7 @@ class IonLog():
         Call this to trigger a reload and reparse of the logfile.
         @retval None
         """
+        tzero = time()
         try:
             logging.debug('Opening %s' % self.fn)
             fh = open(self.fn)
@@ -114,7 +116,8 @@ class IonLog():
             logging.exception('Error reading file')
             return None
 
-        logging.debug('Found %d messages in %s' % (len(pdata), self.fn))
+        delta_t = time() - tzero
+        logging.debug('Took %f seconds to find %d messages in %s' % (delta_t, len(pdata), self.fn))
         # OK, we now have a list of tuples. Convert in two passes to N
         # arrays keyed on process/service name.
         # First, create array of arrays
