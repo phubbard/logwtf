@@ -28,11 +28,23 @@ logwtf.info_color = '#00f';
 logwtf.warn_color = '#ff0';
 logwtf.error_color = '#f00';
 
+function configure_slider(max_time)
+{
+    //alert(max_time);
+}
+
+function on_slide(value)
+{
+    // Slider callback, eventually
+    alert(value);
+}
+
 function main()
 {
     // Top-level orchestration routine for the system.
     var config = pull_base_logpage();
 
+    configure_slider(config.timespan);
     draw_basic_canvas(config.num_cols, config.column_names);
     console.info('span: ' + config.timespan);
     console.info('max : ' + config.max_messages);
