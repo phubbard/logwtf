@@ -30,6 +30,7 @@ logwtf.error_color = '#f00';
 
 function configure_slider(max_time)
 {
+    $( "#slider" ).bind("slidestop", function(event, ui) {on_slide(10.0);})
     //alert(max_time);
 }
 
@@ -70,8 +71,8 @@ function draw_basic_canvas(num_cols, column_names)
     var context = canvas.getContext("2d");
 
     // Resize to fill window, side effect is to clear content
-    canvas.height = $(window).height();
-    canvas.width = $(window).width();
+    canvas.height = $(window).height() * 0.98;
+    canvas.width = $(window).width() * 0.98;
 
     // Figure how many rows we have and save
     logwtf.num_rows = $(window).height() / 10;

@@ -117,9 +117,11 @@ class IonLog():
             return None
 
         delta_t = time() - tzero
-        logging.debug('Took %f seconds to find %d messages in %s' % (delta_t, len(pdata), self.fn))
+        logging.debug('Took %f seconds to find %d messages' % (delta_t, len(pdata)))
         # OK, we now have a list of tuples. Convert in two passes to N
         # arrays keyed on process/service name.
+
+        tzero = time()
         # First, create array of arrays
         pdlist = {}
         # Next, walk and create an array for each unique process id
@@ -149,6 +151,8 @@ class IonLog():
             if len(key) > self.max_per_source:
                 self.max_per_source = len(key)
 
+        delta_t = time() - tzero
+        logging.debug('%f seconds to split data into arrays' % delta_t)
         logging.debug('Timespan: %f Max messages: %d' % (self.max_delta_t, self.max_per_source))
 
     def get_config(self):

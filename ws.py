@@ -25,6 +25,18 @@ ION_LOGFILE = ION_LOGFILEDIR + '/' + 'ioncontainer.log'
 
 
 class IonLFP(resource.Resource):
+    html_header = """
+    <html>
+    <title>logwtf REST server</title>
+    <body>
+    Welcome to <a href="https://github.com/phubbard/logwtf">logwtf</a>.
+    <p>
+    """
+    html_footer = """
+    </body>
+    </html>
+    """
+
     def __init__(self, data_object, name):
         resource.Resource.__init__(self)
         self.ilo = data_object
@@ -50,11 +62,16 @@ class IonLFP(resource.Resource):
             # Force reload and parse on root page load
             self.ilo.load_and_parse()
             keys = self.ilo.get_names()
-            request.write('<html>Logs by identifier:<nl>')
+            request.write(self.html_header)
+            request.write('<h3>Current logfile</h3>')
+            request.write('<pre>%s</pre>' % self.ilo.fn)
+            request.write('<a href="/get_configuration">Configuration</a><p>')
+            request.write('Logs by identifier:<nl>')
             for x in keys:
                 request.write('<li><a href="/%s?&format=text">%s</a>' % (x,x))
                 request.write(' <a href="/%s">(json)</a></li>' % x)
-            request.write('</nl></html>')
+            request.write('</nl>')
+            request.write(self.html_footer)
             return ''
 
         if self.name == 'get_configuration':
