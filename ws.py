@@ -65,7 +65,9 @@ class IonLFP(resource.Resource):
             request.write(self.html_header)
             request.write('<h3>Current logfile</h3>')
             request.write('<pre>%s</pre>' % self.ilo.fn)
-            request.write('<a href="/get_configuration">Configuration</a><p>')
+            request.write('%d entities, timespan of %f seconds, max messages per entity is %d<p>' %
+                          (len(self.ilo.keys), self.ilo.max_delta_t, self.ilo.max_per_source))
+            request.write('<a href="/get_configuration">Configuration json</a><p>')
             request.write('Logs by identifier:<nl>')
             for x in keys:
                 request.write('<li><a href="/%s?&format=text">%s</a>' % (x,x))
