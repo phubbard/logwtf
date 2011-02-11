@@ -8,10 +8,14 @@
 
 
 from twisted.web import server, resource
+from twisted.web import static
 from twisted.web.server import Site
 from twisted.internet import reactor
 
-import simplejson as json
+try:
+    import json
+except ImportError:
+    import simplejson as json
 import logging
 import fileinput
 import os
@@ -21,7 +25,9 @@ from stat import ST_MODE, S_ISREG
 from ionlog import IonLog
 
 ION_LOGFILEDIR = '/Users/hubbard/code/lcaarch/logs'
-ION_LOGFILE = ION_LOGFILEDIR + '/' + 'ioncontainer.log'
+ION_LOGFILEDIR = '/Users/dorian/code/logwtf'
+ION_LOGFILE = os.path.join(ION_LOGFILEDIR, 'ioncontainer.log')
+HTML = os.path.join(ION_LOGFILEDIR, 'one.html')
 
 
 class IonLFP(resource.Resource):
@@ -101,10 +107,12 @@ class LogFileRootPage(resource.Resource):
         return IonLFP(self.ilo, name)
 
 
+
 def main():
     logging.basicConfig(level=logging.DEBUG,
         format='%(asctime)s %(levelname)s [%(funcName)s] %(message)s')
     root = LogFileRootPage(ION_LOGFILE)
+    root.putChild('app', static.File(ION_LOGFILEDIR))
     factory = Site(root)
     reactor.listenTCP(2200, factory)
     logging.info('http://localhost:2200/')
